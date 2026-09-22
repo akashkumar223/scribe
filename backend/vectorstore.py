@@ -15,19 +15,20 @@ _client = chromadb.PersistentClient(path=PERSIST_DIR)
 
 # Load the model directly ourselves (not via chromadb's wrapper) so we can
 # force local_files_only and guarantee no network call, even on restarts.
-_model = SentenceTransformer(
-    "all-MiniLM-L6-v2",
-    token=HF_TOKEN,
-    local_files_only=not bool(HF_TOKEN),
-)
+_model = None
 
+def _get_model():
+    """Load the embedding model on first use, not at import time — this lets
+    the server bind its port immediately instead of blocking on a download."""
+    global _model
+    if _model is None:
+        _model = SentenceTransformer("all-MiniLM-L6-v2", token=HF_TOKEN)
+    return _model
 
 class _LocalEmbeddingFunction:
     """Minimal embedding function matching chromadb's expected interface."""
     def __call__(self, input: list[str]) -> list[list[float]]:
-        return _model.encode(input, convert_to_numpy=True).tolist()
-
-
+        return _get_model().encode(input, convert_to_numpy=True).tolist()
 _embed_fn = _LocalEmbeddingFunction()
 
 _collection = _client.get_or_create_collection(
