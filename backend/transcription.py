@@ -27,7 +27,7 @@ def transcribe_audio(file_path: str) -> dict:
     Transcribes an audio/video file. Returns the full text plus timestamped
     segments (useful later if you want a "jump to this moment" UI feature).
     """
-    segments, info = _model.transcribe(file_path, beam_size=5)
+      segments, info = _get_model().transcribe(file_path, beam_size=5)
 
     segment_list = []
     full_text_parts = []
