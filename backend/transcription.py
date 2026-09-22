@@ -13,7 +13,13 @@ from faster_whisper import WhisperModel
 
 # "base" is a good balance of speed/accuracy for a hackathon/demo on a laptop CPU.
 # Options (fastest to most accurate): tiny, base, small, medium, large-v3
-_model = WhisperModel("base", device="cpu", compute_type="int8")
+_model = None
+
+def _get_model():
+    global _model
+    if _model is None:
+        _model = WhisperModel("base", device="cpu", compute_type="int8")
+    return _model
 
 
 def transcribe_audio(file_path: str) -> dict:
