@@ -1,7 +1,7 @@
 fastapi==0.115.0
 uvicorn[standard]==0.30.6
 python-multipart==0.0.9
-faster-whisper>=1.0.3
+faster-whisper
 
 torch==2.9.0
 torchaudio==2.9.0
