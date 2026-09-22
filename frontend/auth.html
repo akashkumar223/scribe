@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Scribe - Account Access</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet" />
+<style>
+:root { --ink:#172033; --muted:#6b7687; --line:#e3e8f0; --blue:#315bea; --purple:#7454d8; --bg:#f5f7fa; }
+* { box-sizing:border-box; }
+body { margin:0; min-height:100vh; display:grid; place-items:center; padding:24px; color:var(--ink); font-family:"DM Sans",sans-serif; background:radial-gradient(circle at 15% 10%,#e9efff 0,transparent 32%),linear-gradient(135deg,#f5f7fa,#eef1f7); }
+.auth-shell { width:min(940px,100%); display:grid; grid-template-columns:1fr 1fr; overflow:hidden; background:#fff; border:1px solid var(--line); border-radius:16px; box-shadow:0 24px 70px rgba(23,32,51,.12); }
+.auth-intro { padding:54px 44px; color:#fff; background:linear-gradient(145deg,#101827,#253865); }
+.logo { width:42px; height:42px; display:grid; place-items:center; border-radius:11px; background:linear-gradient(135deg,#6687ff,#315bea); font-weight:700; font-size:20px; box-shadow:0 8px 24px rgba(49,91,234,.38); }
+h1 { margin:30px 0 12px; font:700 39px/1.08 "Source Serif 4",serif; letter-spacing:-.02em; }
+.auth-intro p { max-width:310px; color:#b8c4d8; line-height:1.7; font-size:14px; }
+.intro-rule { width:48px; height:4px; margin-top:30px; border-radius:3px; background:#9daeff; }
+.auth-form { padding:42px; }
+.form-heading { margin:0; font:700 28px "Source Serif 4",serif; }
+.form-subtitle { margin:7px 0 26px; color:var(--muted); font-size:13px; }
+.mode-switch,.role-switch { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-bottom:18px; padding:4px; border-radius:9px; background:#f3f5f9; }
+.mode-switch button,.role-switch button { border:0; padding:10px; border-radius:7px; color:var(--muted); background:transparent; font:600 12px "DM Sans",sans-serif; cursor:pointer; }
+.mode-switch button.active,.role-switch button.active { color:var(--ink); background:#fff; box-shadow:0 2px 8px rgba(23,32,51,.08); }
+label { display:block; margin:15px 0 7px; color:var(--muted); font-size:11px; font-weight:700; }
+input { width:100%; padding:12px 13px; border:1px solid var(--line); border-radius:8px; outline:0; color:var(--ink); font:14px "DM Sans",sans-serif; }
+input:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(49,91,234,.11); }
+.primary { width:100%; margin-top:23px; padding:13px; border:0; border-radius:8px; color:#fff; background:var(--blue); font:700 13px "DM Sans",sans-serif; cursor:pointer; }
+.primary.admin { background:var(--purple); }
+.primary:disabled { opacity:.6; cursor:wait; }
+.notice { min-height:20px; margin-top:14px; font-size:12px; line-height:1.5; }
+.notice.error { color:#c23f48; }.notice.success { color:#18864b; }
+.helper { margin-top:18px; color:var(--muted); font-size:11px; line-height:1.5; }
+@media(max-width:700px) { body { padding:12px; }.auth-shell { grid-template-columns:1fr; }.auth-intro { padding:30px; }.auth-intro h1 { margin-top:20px; font-size:32px; }.auth-form { padding:30px 24px; } }
+</style>
+</head>
+<body>
+<div class="auth-shell">
+    <section class="auth-intro">
+        <div class="logo">S</div>
+        <h1>Work clearly. Think deeply.</h1>
+        <p>Scribe brings transcripts, documents, analytics, and AI notes into one focused workspace.</p>
+        <div class="intro-rule"></div>
+    </section>
+    <main class="auth-form">
+        <h2 class="form-heading" id="formHeading">Welcome back</h2>
+        <p class="form-subtitle" id="formSubtitle">Sign in to continue to your workspace.</p>
+        <div class="mode-switch">
+            <button id="loginMode" class="active" type="button">Sign in</button>
+            <button id="registerMode" type="button">Create account</button>
+        </div>
+        <div class="role-switch">
+            <button id="userRole" class="active" type="button">User</button>
+            <button id="adminRole" type="button">Admin</button>
+        </div>
+        <form id="authForm">
+            <label for="email">Email address</label>
+            <input id="email" type="email" autocomplete="email" required placeholder="you@example.com" />
+            <label for="password">Password</label>
+            <input id="password" type="password" autocomplete="current-password" minlength="8" required placeholder="At least 8 characters" />
+            <div id="adminCodeField" hidden>
+                <label for="adminCode">Admin invite code</label>
+                <input id="adminCode" type="password" autocomplete="off" placeholder="Required for admin access" />
+            </div>
+            <button id="submitButton" class="primary" type="submit">Sign in</button>
+        </form>
+        <div id="notice" class="notice" role="status"></div>
+        <div class="helper">Admin registration requires an invite code configured by the workspace owner.</div>
+    </main>
+</div>
+<script>
+const API_BASE="http://localhost:8000";
+let mode="login";
+let role="user";
+const $=id=>document.getElementById(id);
+const setMode=next=>{
+    mode=next;
+    $("loginMode").classList.toggle("active",mode==="login");
+    $("registerMode").classList.toggle("active",mode==="register");
+    $("formHeading").textContent=mode==="login"?"Welcome back":"Create your account";
+    $("formSubtitle").textContent=mode==="login"?"Sign in to continue to your workspace.":"Choose your workspace role and get started.";
+    $("submitButton").textContent=mode==="login"?"Sign in":"Create account";
+    $("password").setAttribute("autocomplete",mode==="login"?"current-password":"new-password");
+};
+const setRole=next=>{
+    role=next;
+    $("userRole").classList.toggle("active",role==="user");
+    $("adminRole").classList.toggle("active",role==="admin");
+    $("adminCodeField").hidden=role!=="admin" || mode!=="register";
+    $("submitButton").classList.toggle("admin",role==="admin");
+};
+$("loginMode").onclick=()=>{setMode("login");setRole(role);};
+$("registerMode").onclick=()=>{setMode("register");setRole(role);};
+$("userRole").onclick=()=>setRole("user");
+$("adminRole").onclick=()=>setRole("admin");
+setMode(window.location.hash==="#register"?"register":"login");
+setRole(role);
+$("authForm").onsubmit=async event=>{
+    event.preventDefault();
+    const notice=$("notice");
+    const button=$("submitButton");
+    notice.className="notice";
+    notice.textContent="";
+    button.disabled=true;
+    try {
+        const response=await fetch(`${API_BASE}/auth/${mode}`,{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({
+                email:$("email").value,
+                password:$("password").value,
+                role,
+                admin_code:$("adminCode").value || null
+            })
+        });
+        const result=await response.json();
+        if(!response.ok) throw new Error(result.detail || "Authentication failed");
+        if(mode==="register"){
+            notice.className="notice success";
+            notice.textContent="Account created. You can now sign in.";
+            setMode("login");
+            $("password").value="";
+        } else {
+            localStorage.setItem("scribeUser",JSON.stringify(result.user));
+            window.location.href="index.html";
+        }
+    } catch(error) {
+        notice.className="notice error";
+        notice.textContent=error.message;
+    } finally { button.disabled=false; }
+};
+</script>
+</body>
+</html>

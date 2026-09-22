@@ -1,0 +1,3168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>Scribe — Enterprise AI Workspace</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+<style>
+
+:root {
+    --bg: #f5f7fa;
+    --surface: #ffffff;
+    --surface-2: #f8fafc;
+
+    --sidebar: #101827;
+    --sidebar-hover: #1b2638;
+    --sidebar-text: #9ca8b8;
+    --sidebar-active: #ffffff;
+
+    --text: #172033;
+    --muted: #6b7687;
+    --subtle: #9aa4b2;
+
+    --border: #e6eaf0;
+    --border-dark: #d6dce5;
+
+    --primary: #315bea;
+    --primary-dark: #2448c4;
+    --primary-soft: #edf2ff;
+
+    --green: #18864b;
+    --green-soft: #eaf8f0;
+
+    --purple: #7454d8;
+    --purple-soft: #f2efff;
+
+    --orange: #d47a19;
+    --orange-soft: #fff5e8;
+
+    --red: #d94b4b;
+    --red-soft: #fff0f0;
+
+    --shadow-sm: 0 1px 2px rgba(16,24,40,.04);
+    --shadow-md: 0 8px 24px rgba(16,24,40,.06);
+
+    --radius: 10px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: "DM Sans", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+}
+
+button,
+input {
+    font-family: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.app {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ================= SIDEBAR ================= */
+
+.sidebar {
+    width: 250px;
+    min-height: 100vh;
+    background: var(--sidebar);
+    color: white;
+    padding: 22px 14px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 50;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 0 10px;
+    margin-bottom: 30px;
+}
+
+.brand-logo {
+    width: 34px;
+    height: 34px;
+    background: linear-gradient(135deg,#6687ff,#315bea);
+    border-radius: 9px;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    box-shadow: 0 5px 18px rgba(49,91,234,.35);
+}
+
+.brand-name {
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+}
+
+.brand-version {
+    font-size: 9px;
+    color: #718096;
+    margin-left: auto;
+}
+
+.workspace {
+    padding: 11px 12px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.035);
+    border-radius: 9px;
+    margin-bottom: 24px;
+}
+
+.workspace-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #718096;
+    margin-bottom: 6px;
+}
+
+.workspace-name {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.nav-title {
+    color: #687589;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    padding: 0 12px;
+    margin: 18px 0 8px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: var(--sidebar-text);
+    padding: 10px 12px;
+    border-radius: 7px;
+    text-align: left;
+    font-size: 13px;
+    margin-bottom: 3px;
+    transition: .2s ease;
+}
+
+.nav-item:hover {
+    background: var(--sidebar-hover);
+    color: white;
+}
+
+.nav-item.active {
+    background: rgba(255,255,255,.10);
+    color: white;
+}
+
+.nav-icon {
+    width: 19px;
+    text-align: center;
+    opacity: .9;
+}
+
+.nav-badge {
+    margin-left: auto;
+    background: rgba(255,255,255,.1);
+    padding: 2px 7px;
+    border-radius: 20px;
+    font-size: 10px;
+}
+
+.sidebar-bottom {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 18px;
+}
+
+.user-card {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px;
+    border-top: 1px solid rgba(255,255,255,.07);
+}
+
+.avatar {
+    width: 31px;
+    height: 31px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #dbe5ff;
+    color: #315bea;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.user-name {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.user-role {
+    color: #6f7d91;
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+/* ================= MAIN ================= */
+
+.main {
+    margin-left: 250px;
+    flex: 1;
+    min-width: 0;
+}
+
+/* ================= TOPBAR ================= */
+
+.topbar {
+    height: 68px;
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+}
+
+.page-title {
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.page-subtitle {
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+.top-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search {
+    width: 230px;
+    position: relative;
+}
+
+.search input {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: #f8fafc;
+    padding: 9px 12px 9px 34px;
+    border-radius: 7px;
+    outline: none;
+    font-size: 12px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 11px;
+    top: 8px;
+    color: var(--muted);
+}
+
+.icon-button {
+    width: 35px;
+    height: 35px;
+    border: 1px solid var(--border);
+    background: white;
+    border-radius: 7px;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--green);
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #26a65b;
+}
+
+/* ================= CONTENT ================= */
+
+.content {
+    max-width: 1440px;
+    margin: auto;
+    padding: 30px 32px 60px;
+}
+
+/* ================= HERO ================= */
+
+.hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 25px;
+}
+
+.hero h1 {
+    font-family: "Source Serif 4", serif;
+    font-size: 31px;
+    margin: 0;
+    letter-spacing: -.025em;
+}
+
+.hero p {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.primary-btn {
+    border: none;
+    background: var(--primary);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(49,91,234,.18);
+    transition: .2s;
+}
+
+.primary-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+/* ================= STATS ================= */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 17px;
+    box-shadow: var(--shadow-sm);
+}
+
+.stat-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-label {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.stat-icon {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 7px;
+    font-size: 14px;
+}
+
+.stat-icon.blue {
+    background: var(--primary-soft);
+}
+
+.stat-icon.green {
+    background: var(--green-soft);
+}
+
+.stat-icon.purple {
+    background: var(--purple-soft);
+}
+
+.stat-icon.orange {
+    background: var(--orange-soft);
+}
+
+.stat-value {
+    font-size: 25px;
+    font-weight: 700;
+    margin-top: 9px;
+    letter-spacing: -.03em;
+}
+
+.stat-change {
+    font-size: 10px;
+    color: var(--green);
+    margin-top: 4px;
+}
+
+/* ================= PANELS ================= */
+
+.panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 17px 19px;
+    border-bottom: 1px solid var(--border);
+}
+
+.panel-title {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.panel-subtitle {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 3px;
+}
+
+.panel-body {
+    padding: 19px;
+}
+
+/* ================= UPLOAD ================= */
+
+.upload-box {
+    border: 1.5px dashed #cbd4e1;
+    background: #fbfcfe;
+    border-radius: 9px;
+    padding: 30px;
+    text-align: center;
+    transition: .2s;
+}
+
+.upload-box:hover {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+}
+
+.upload-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    display: grid;
+    place-items: center;
+    margin: auto;
+    font-size: 19px;
+}
+
+.upload-title {
+    margin-top: 11px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.upload-description {
+    color: var(--muted);
+    font-size: 11px;
+    margin: 5px 0 13px;
+}
+
+input[type=file] {
+    display: none;
+}
+
+/* ================= TWO COLUMN ================= */
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: minmax(0,1.45fr) minmax(320px,.8fr);
+    gap: 18px;
+    align-items: start;
+}
+
+.file-list {
+    padding: 4px 19px 10px;
+}
+
+.file-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.file-row:last-child {
+    border-bottom: none;
+}
+
+.file-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 7px;
+    display: grid;
+    place-items: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.file-icon.doc {
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+
+.file-icon.data {
+    background: var(--green-soft);
+    color: var(--green);
+}
+
+.file-icon.audio {
+    background: var(--purple-soft);
+    color: var(--purple);
+}
+
+.file-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.file-name {
+    font-size: 12px;
+    font-weight: 600;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.file-meta {
+    color: var(--muted);
+    font-size: 10px;
+    margin-top: 3px;
+}
+
+.file-status {
+    padding: 4px 8px;
+    background: var(--green-soft);
+    color: var(--green);
+    border-radius: 20px;
+    font-size: 9px;
+    font-weight: 600;
+}
+
+.delete {
+    border: none;
+    background: transparent;
+    color: #a3acb9;
+    font-size: 12px;
+}
+
+.delete:hover {
+    color: var(--red);
+}
+
+/* ================= QUICK ACTIONS ================= */
+
+.quick-actions {
+    display: grid;
+    gap: 9px;
+}
+
+.quick-action {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    background: white;
+    border-radius: 8px;
+    text-align: left;
+    transition: .2s;
+}
+
+.quick-action:hover {
+    border-color: #cbd5ee;
+    background: #fbfcff;
+    transform: translateY(-1px);
+}
+
+.quick-action-icon {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 7px;
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+
+.quick-action strong {
+    display: block;
+    font-size: 11px;
+}
+
+.quick-action span {
+    display: block;
+    color: var(--muted);
+    font-size: 9px;
+    margin-top: 2px;
+}
+
+/* ================= DATA / TRANSCRIPT ================= */
+
+.section-tabs {
+    display: flex;
+    gap: 5px;
+    background: #eef1f5;
+    padding: 4px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.section-tab {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 9px;
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.section-tab.active {
+    background: white;
+    color: var(--text);
+    box-shadow: var(--shadow-sm);
+}
+
+.data-active {
+    color: var(--green) !important;
+}
+
+.transcript-active {
+    color: var(--purple) !important;
+}
+
+/* ================= TABLE ================= */
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+th {
+    background: #f8fafc;
+    color: var(--muted);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    text-align: left;
+    padding: 10px 13px;
+    border-bottom: 1px solid var(--border);
+}
+
+td {
+    padding: 11px 13px;
+    border-bottom: 1px solid var(--border);
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+/* ================= ANALYTICS ================= */
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 12px;
+    margin-bottom: 17px;
+}
+
+.analytics-card {
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.analytics-number {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.analytics-label {
+    color: var(--muted);
+    font-size: 10px;
+    margin-top: 3px;
+}
+
+.score {
+    font-family: "Source Serif 4",serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--green);
+}
+
+/* ================= CHAT ================= */
+
+.chat {
+    margin-top: 20px;
+}
+
+.chat-window {
+    height: 380px;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.chat-empty {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    text-align: center;
+}
+
+.chat-empty-icon {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    background: var(--primary-soft);
+    color: var(--primary);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    font-size: 20px;
+}
+
+.chat-empty-title {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.chat-empty-text {
+    max-width: 350px;
+    font-size: 11px;
+    line-height: 1.6;
+    margin-top: 5px;
+}
+
+.message {
+    max-width: 78%;
+    margin-bottom: 15px;
+}
+
+.message.user {
+    margin-left: auto;
+}
+
+.message-bubble {
+    padding: 11px 14px;
+    border-radius: 9px;
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+.message.user .message-bubble {
+    background: var(--primary);
+    color: white;
+    border-bottom-right-radius: 3px;
+}
+
+.message.assistant .message-bubble {
+    background: #f6f8fb;
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 3px;
+}
+
+.citations {
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: 7px;
+}
+
+.composer {
+    display: flex;
+    gap: 8px;
+    border-top: 1px solid var(--border);
+    padding: 12px;
+    background: #fbfcfd;
+}
+
+.composer input {
+    flex: 1;
+    border: 1px solid var(--border-dark);
+    background: white;
+    border-radius: 7px;
+    padding: 10px 12px;
+    font-size: 12px;
+    outline: none;
+}
+
+.composer input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(49,91,234,.08);
+}
+
+.send {
+    border: none;
+    background: var(--primary);
+    color: white;
+    padding: 0 17px;
+    border-radius: 7px;
+    font-weight: 600;
+    font-size: 11px;
+}
+
+/* ================= EMPTY ================= */
+
+.empty {
+    color: var(--muted);
+    font-size: 11px;
+    text-align: center;
+    padding: 25px 10px;
+}
+
+/* ================= LIVE RECORDING ================= */
+
+.live {
+    border: 1px solid #dfd4ff;
+    background: var(--purple-soft);
+    border-radius: 8px;
+    padding: 14px;
+    margin-top: 15px;
+}
+
+.live-status {
+    color: var(--purple);
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.live-text {
+    margin-top: 9px;
+    background: white;
+    border-radius: 6px;
+    padding: 11px;
+    min-height: 70px;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.camera-preview {
+    margin-top: 14px;
+    max-width: 520px;
+}
+
+.camera-preview video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #111827;
+}
+
+.camera-controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+/* ================= MOBILE ================= */
+
+.mobile-menu {
+    display: none;
+}
+
+@media(max-width:1000px) {
+
+    .sidebar {
+        width: 215px;
+    }
+
+    .main {
+        margin-left: 215px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2,1fr);
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media(max-width:700px) {
+
+    .sidebar {
+        display: none;
+    }
+
+    .main {
+        margin-left: 0;
+    }
+
+    .topbar {
+        padding: 0 15px;
+    }
+
+    .search {
+        display: none;
+    }
+
+    .content {
+        padding: 20px 15px 40px;
+    }
+
+    .hero {
+        align-items: flex-start;
+        gap: 15px;
+        flex-direction: column;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel">
+
+const {useState,useEffect,useRef}=React;
+
+const API_BASE="http://localhost:8000";
+
+/* ================= ICON ================= */
+
+function Icon({children}) {
+    return <span className="nav-icon">{children}</span>
+}
+
+/* ================= FILE ICON ================= */
+
+function FileIcon({type}) {
+
+    if(type==="data")
+        return <div className="file-icon data">▦</div>;
+
+    if(type==="audio")
+        return <div className="file-icon audio">♫</div>;
+
+    return <div className="file-icon doc">▤</div>;
+}
+
+/* ================= SIDEBAR ================= */
+
+function Sidebar({
+    section,
+    setSection,
+    documents,
+    dataFiles,
+    transcriptFiles,
+    currentUser,
+    logout
+}) {
+
+    return (
+
+        <aside className="sidebar">
+
+            <div className="brand">
+
+                <div className="brand-logo">
+                    S
+                </div>
+
+                <div className="brand-name">
+                    Scribe
+                </div>
+
+                <div className="brand-version">
+                    AI
+                </div>
+
+            </div>
+
+            <div className="workspace">
+
+                <div className="workspace-label">
+                    Workspace
+                </div>
+
+                <div className="workspace-name">
+                    Enterprise Workspace
+                </div>
+
+            </div>
+
+            <div className="nav-title">
+                Workspace
+            </div>
+
+            <button
+                className={"nav-item "+(section==="documents"?"active":"")}
+                onClick={()=>setSection("documents")}
+            >
+                <Icon>▤</Icon>
+                Documents
+                <span className="nav-badge">
+                    {documents.length}
+                </span>
+            </button>
+
+            <button
+                className={"nav-item "+(section==="datasets"?"active":"")}
+                onClick={()=>setSection("datasets")}
+            >
+                <Icon>▦</Icon>
+                Data & Analytics
+                <span className="nav-badge">
+                    {dataFiles.length}
+                </span>
+            </button>
+
+            <button
+                className={"nav-item "+(section==="transcripts"?"active":"")}
+                onClick={()=>setSection("transcripts")}
+            >
+                <Icon>♫</Icon>
+                Transcripts
+                <span className="nav-badge">
+                    {transcriptFiles.length}
+                </span>
+            </button>
+
+            <div className="nav-title">
+                AI Tools
+            </div>
+
+            <button className="nav-item">
+                <Icon>✦</Icon>
+                AI Assistant
+            </button>
+
+            <button className="nav-item">
+                <Icon>⌁</Icon>
+                Knowledge Search
+            </button>
+
+            <button className="nav-item">
+                <Icon>↗</Icon>
+                Reports
+            </button>
+
+            <div className="nav-title">
+                System
+            </div>
+
+            <button className="nav-item">
+                <Icon>⚙</Icon>
+                Settings
+            </button>
+
+            <div className="sidebar-bottom">
+
+                <div className="user-card">
+
+                    <div className="avatar">
+                        {(currentUser?.email || "?").slice(0,2).toUpperCase()}
+                    </div>
+
+                    <div>
+                        <div className="user-name">
+                            {currentUser?.email || "Unknown user"}
+                        </div>
+
+                        <div className="user-role">
+                            {currentUser?.role === "admin" ? "Administrator" : "User"}
+                        </div>
+                    </div>
+
+                </div>
+
+                <button
+                    className="nav-item"
+                    style={{marginTop:6, justifyContent:"center", color:"#f2a5a5"}}
+                    onClick={logout}
+                >
+                    Log out
+                </button>
+
+            </div>
+
+        </aside>
+    )
+}
+
+/* ================= TOPBAR ================= */
+
+function Topbar({section}) {
+
+    const titles={
+        documents:["Documents","Manage your organization's knowledge"],
+        datasets:["Data & Analytics","Explore and understand your datasets"],
+        transcripts:["Transcripts","Meetings, recordings and AI-generated notes"]
+    };
+
+    const current=titles[section];
+
+    return (
+
+        <header className="topbar">
+
+            <div>
+
+                <div className="page-title">
+                    {current[0]}
+                </div>
+
+                <div className="page-subtitle">
+                    {current[1]}
+                </div>
+
+            </div>
+
+            <div className="top-actions">
+
+                <div className="status">
+                    <span className="status-dot"></span>
+                    All systems operational
+                </div>
+
+                <div className="search">
+
+                    <span className="search-icon">
+                        ⌕
+                    </span>
+
+                    <input
+                        placeholder="Search workspace..."
+                    />
+
+                </div>
+
+                <button className="icon-button">
+                    ?
+                </button>
+
+                <button className="icon-button">
+                    ◔
+                </button>
+
+            </div>
+
+        </header>
+    )
+}
+
+/* ================= STATS ================= */
+
+function Stats({
+    documents,
+    dataFiles,
+    transcriptFiles,
+    messages
+}) {
+
+    const aiQueryCount = messages.filter(m => m.role === "user").length;
+
+    return (
+
+        <div className="stats-grid">
+
+            <div className="stat-card">
+
+                <div className="stat-top">
+
+                    <span className="stat-label">
+                        Total documents
+                    </span>
+
+                    <div className="stat-icon blue">
+                        ▤
+                    </div>
+
+                </div>
+
+                <div className="stat-value">
+                    {documents.length}
+                </div>
+
+                <div className="stat-change">
+                    Workspace knowledge
+                </div>
+
+            </div>
+
+
+            <div className="stat-card">
+
+                <div className="stat-top">
+
+                    <span className="stat-label">
+                        Datasets
+                    </span>
+
+                    <div className="stat-icon green">
+                        ▦
+                    </div>
+
+                </div>
+
+                <div className="stat-value">
+                    {dataFiles.length}
+                </div>
+
+                <div className="stat-change">
+                    Analytics ready
+                </div>
+
+            </div>
+
+
+            <div className="stat-card">
+
+                <div className="stat-top">
+
+                    <span className="stat-label">
+                        Transcripts
+                    </span>
+
+                    <div className="stat-icon purple">
+                        ♫
+                    </div>
+
+                </div>
+
+                <div className="stat-value">
+                    {transcriptFiles.length}
+                </div>
+
+                <div className="stat-change">
+                    AI processed
+                </div>
+
+            </div>
+
+
+            <div className="stat-card">
+
+                <div className="stat-top">
+
+                    <span className="stat-label">
+                        AI queries
+                    </span>
+
+                    <div className="stat-icon orange">
+                        ✦
+                    </div>
+
+                </div>
+
+                <div className="stat-value">
+                    {aiQueryCount}
+                </div>
+
+                <div className="stat-change">
+                    Ask your workspace
+                </div>
+
+            </div>
+
+        </div>
+    )
+}
+
+/* ================= DOCUMENTS ================= */
+
+function Documents({
+    documents,
+    dataFiles,
+    transcriptFiles,
+    upload,
+    deleteFile,
+    loading
+}) {
+
+    const dataSet=new Set(dataFiles);
+    const transcriptSet=new Set(transcriptFiles);
+
+    const docs=documents.filter(
+        f=>!dataSet.has(f)&&!transcriptSet.has(f)
+    );
+
+    return (
+
+        <>
+
+            <div className="hero">
+
+                <div>
+
+                    <h1>
+                        Your knowledge workspace
+                    </h1>
+
+                    <p>
+                        Upload documents and let Scribe turn them into searchable knowledge.
+                    </p>
+
+                </div>
+
+                <label className="primary-btn">
+
+                    + Upload document
+
+                    <input
+                        type="file"
+                        onChange={upload}
+                        accept=".pdf,.docx,.txt,.csv,.xlsx,.xls"
+                    />
+
+                </label>
+
+            </div>
+
+
+            <div className="dashboard-grid">
+
+                <div className="panel">
+
+                    <div className="panel-header">
+
+                        <div>
+
+                            <div className="panel-title">
+                                Recent documents
+                            </div>
+
+                            <div className="panel-subtitle">
+                                Files available to your AI workspace
+                            </div>
+
+                        </div>
+
+                        <span className="status">
+                            ● Synced
+                        </span>
+
+                    </div>
+
+                    <div className="file-list">
+
+                        {docs.length===0 ?
+
+                            <div className="empty">
+                                No documents uploaded yet.
+                            </div>
+
+                        :
+
+                            docs.map(file=>
+
+                                <div
+                                    className="file-row"
+                                    key={file}
+                                >
+
+                                    <FileIcon type="doc"/>
+
+                                    <div className="file-info">
+
+                                        <div className="file-name">
+                                            {file}
+                                        </div>
+
+                                        <div className="file-meta">
+                                            Available for AI search
+                                        </div>
+
+                                    </div>
+
+                                    <span className="file-status">
+                                        Ready
+                                    </span>
+
+                                    <button
+                                        className="delete"
+                                        style={{color:"var(--primary)", fontSize:10, fontWeight:700}}
+                                        onClick={()=>window.open(`${API_BASE}/documents/${encodeURIComponent(file)}/summary-pdf`, "_blank")}
+                                        title="Download professional summary as PDF"
+                                    >
+                                        ⬇ PDF
+                                    </button>
+
+                                    <button
+                                        className="delete"
+                                        onClick={()=>deleteFile(file)}
+                                    >
+                                        ×
+                                    </button>
+
+                                </div>
+                            )
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div className="panel">
+
+                    <div className="panel-header">
+
+                        <div>
+
+                            <div className="panel-title">
+                                Quick actions
+                            </div>
+
+                            <div className="panel-subtitle">
+                                Common workspace operations
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div className="panel-body">
+
+                        <div className="quick-actions">
+
+                            <label className="quick-action">
+
+                                <div className="quick-action-icon">
+                                    ↑
+                                </div>
+
+                                <div>
+                                    <strong>
+                                        Upload knowledge
+                                    </strong>
+
+                                    <span>
+                                        PDF, DOCX, TXT
+                                    </span>
+                                </div>
+
+                                <input
+                                    type="file"
+                                    onChange={upload}
+                                    accept=".pdf,.docx,.txt"
+                                />
+
+                            </label>
+
+
+                            <label className="quick-action">
+
+                                <div className="quick-action-icon">
+                                    ▦
+                                </div>
+
+                                <div>
+                                    <strong>
+                                        Analyze dataset
+                                    </strong>
+
+                                    <span>
+                                        CSV or XLSX
+                                    </span>
+                                </div>
+
+                                <input
+                                    type="file"
+                                    onChange={upload}
+                                    accept=".csv,.xlsx,.xls"
+                                />
+
+                            </label>
+
+
+                            <div className="quick-action">
+
+                                <div className="quick-action-icon">
+                                    ✦
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        Ask your knowledge base
+                                    </strong>
+
+                                    <span>
+                                        Search across all files
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </>
+    )
+}
+
+/* ================= DATASETS ================= */
+
+function AnalyticsPanel({filename}) {
+
+    const [data,setData]=useState(null);
+    const canvasRef=useRef();
+    const chartRef=useRef();
+
+    useEffect(()=>{
+
+        if(!filename)return;
+
+        setData(null);
+
+        fetch(
+            `${API_BASE}/analytics/${encodeURIComponent(filename)}`
+        )
+        .then(r=>r.json())
+        .then(setData);
+
+    },[filename]);
+
+
+    useEffect(()=>{
+
+        if(
+            !data ||
+            !data.chart_data ||
+            !canvasRef.current
+        )return;
+
+        if(chartRef.current)
+            chartRef.current.destroy();
+
+        chartRef.current=new Chart(
+            canvasRef.current,
+            {
+                type:"bar",
+
+                data:{
+                    labels:data.chart_data.labels,
+
+                    datasets:[{
+                        label:data.chart_data.column,
+                        data:data.chart_data.values,
+                        backgroundColor:"#315bea",
+                        borderRadius:5
+                    }]
+                },
+
+                options:{
+                    responsive:true,
+
+                    plugins:{
+                        legend:{
+                            display:false
+                        }
+                    },
+
+                    scales:{
+                        x:{
+                            grid:{
+                                display:false
+                            }
+                        },
+
+                        y:{
+                            grid:{
+                                color:"#edf0f4"
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+    },[data]);
+
+
+    if(!filename)return null;
+
+    if(!data)
+        return (
+            <div className="panel">
+                <div className="empty">
+                    Loading analytics...
+                </div>
+            </div>
+        );
+
+
+    return (
+
+        <div className="panel">
+
+            <div className="panel-header">
+
+                <div>
+
+                    <div className="panel-title">
+                        {filename}
+                    </div>
+
+                    <div className="panel-subtitle">
+                        Automated dataset intelligence
+                    </div>
+
+                </div>
+
+                <button
+                    className="primary-btn"
+                    onClick={()=>window.open(`${API_BASE}/analytics/${encodeURIComponent(filename)}/report-pdf`, "_blank")}
+                >
+                    ⬇ Download Report (PDF)
+                </button>
+
+            </div>
+
+            <div className="panel-body">
+
+                <div className="analytics-grid">
+
+                    <div className="analytics-card">
+
+                        <div className="analytics-number">
+                            {data.shape.rows}
+                        </div>
+
+                        <div className="analytics-label">
+                            Rows
+                        </div>
+
+                    </div>
+
+                    <div className="analytics-card">
+
+                        <div className="analytics-number">
+                            {data.shape.columns}
+                        </div>
+
+                        <div className="analytics-label">
+                            Columns
+                        </div>
+
+                    </div>
+
+                    {data.summary_board &&
+
+                        <div className="analytics-card">
+
+                            <div className="score">
+                                {data.summary_board.quality_score}
+                            </div>
+
+                            <div className="analytics-label">
+                                Data quality score
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+
+                {data.summary_board &&
+
+                    <>
+
+                        <div className="panel-title">
+                            Dataset insights
+                        </div>
+
+                        <ul>
+
+                            {data.summary_board.insights.map(
+                                (x,i)=>
+                                <li
+                                    key={i}
+                                    style={{
+                                        fontSize:11,
+                                        marginBottom:7
+                                    }}
+                                >
+                                    {x}
+                                </li>
+                            )}
+
+                        </ul>
+
+                        {data.summary_board.top_correlations &&
+                            data.summary_board.top_correlations.length>0 &&
+
+                            <>
+                                <div className="panel-title" style={{marginTop:16}}>
+                                    Strongest relationships
+                                </div>
+
+                                {data.summary_board.top_correlations.map((p,i)=>
+                                    <div
+                                        key={i}
+                                        style={{
+                                            display:"flex",
+                                            justifyContent:"space-between",
+                                            fontSize:11,
+                                            padding:"6px 0",
+                                            borderBottom:"1px solid var(--border)"
+                                        }}
+                                    >
+                                        <span>{p.col_a} ↔ {p.col_b}</span>
+                                        <span style={{fontWeight:700}}>r = {p.r}</span>
+                                    </div>
+                                )}
+                            </>
+                        }
+
+                        {data.summary_board.outliers &&
+                            data.summary_board.outliers.length>0 &&
+
+                            <>
+                                <div className="panel-title" style={{marginTop:16}}>
+                                    Potential outliers
+                                </div>
+
+                                {data.summary_board.outliers.map((o,i)=>
+                                    <div
+                                        key={i}
+                                        style={{
+                                            display:"flex",
+                                            justifyContent:"space-between",
+                                            fontSize:11,
+                                            padding:"6px 0",
+                                            borderBottom:"1px solid var(--border)"
+                                        }}
+                                    >
+                                        <span>{o.column}</span>
+                                        <span style={{fontWeight:700}}>{o.outlier_count} value(s)</span>
+                                    </div>
+                                )}
+                            </>
+                        }
+
+                    </>
+                }
+
+
+                <div
+                    style={{
+                        marginTop:25,
+                        marginBottom:10,
+                        fontSize:11,
+                        fontWeight:700
+                    }}
+                >
+                    Column overview
+                </div>
+
+                <div className="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Unique</th>
+                                <th>Missing</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {data.columns.map(c=>
+
+                                <tr key={c.name}>
+
+                                    <td>{c.name}</td>
+                                    <td>{c.dtype}</td>
+                                    <td>{c.unique}</td>
+                                    <td>{c.missing_pct}%</td>
+
+                                </tr>
+                            )}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                {data.chart_data &&
+
+                    <>
+
+                        <div
+                            style={{
+                                marginTop:25,
+                                marginBottom:10,
+                                fontSize:11,
+                                fontWeight:700
+                            }}
+                        >
+                            Distribution — {data.chart_data.column}
+                        </div>
+
+                        <canvas ref={canvasRef}></canvas>
+
+                    </>
+                }
+
+            </div>
+
+        </div>
+    )
+}
+
+
+function Datasets({
+    dataFiles,
+    selected,
+    setSelected,
+    upload,
+    deleteFile
+}) {
+
+    return (
+
+        <>
+
+            <div className="hero">
+
+                <div>
+
+                    <h1>
+                        Data intelligence
+                    </h1>
+
+                    <p>
+                        Upload datasets and automatically discover structure, quality and relationships.
+                    </p>
+
+                </div>
+
+                <label className="primary-btn">
+
+                    + Add dataset
+
+                    <input
+                        type="file"
+                        onChange={upload}
+                        accept=".csv,.xlsx,.xls"
+                    />
+
+                </label>
+
+            </div>
+
+
+            <div className="panel">
+
+                <div className="panel-header">
+
+                    <div>
+
+                        <div className="panel-title">
+                            Datasets
+                        </div>
+
+                        <div className="panel-subtitle">
+                            Select a dataset to view analytics
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div className="file-list">
+
+                    {dataFiles.length===0 ?
+
+                        <div className="empty">
+                            No datasets available.
+                        </div>
+
+                    :
+
+                        dataFiles.map(file=>
+
+                            <div
+                                className="file-row"
+                                key={file}
+                                onClick={()=>setSelected(file)}
+                                style={{cursor:"pointer"}}
+                            >
+
+                                <FileIcon type="data"/>
+
+                                <div className="file-info">
+
+                                    <div className="file-name">
+                                        {file}
+                                    </div>
+
+                                    <div className="file-meta">
+                                        Click to inspect dataset
+                                    </div>
+
+                                </div>
+
+                                <span className="file-status">
+                                    Analytics
+                                </span>
+
+                                <button
+                                    className="delete"
+                                    onClick={(e)=>{
+                                        e.stopPropagation();
+                                        deleteFile(file);
+                                    }}
+                                >
+                                    ×
+                                </button>
+
+                            </div>
+                        )
+                    }
+
+                </div>
+
+            </div>
+
+
+            {selected &&
+                <div style={{marginTop:18}}>
+                    <AnalyticsPanel filename={selected}/>
+                </div>
+            }
+
+        </>
+    )
+}
+
+/* ================= TRANSCRIPTS ================= */
+
+function TranscriptPanel({filename}) {
+
+    const [data,setData]=useState(null);
+    const [activeTab,setActiveTab]=useState("brief");
+
+    useEffect(()=>{
+
+        if(!filename)return;
+
+        setData(null);
+        setActiveTab("brief");
+
+        fetch(
+            `${API_BASE}/transcripts/${encodeURIComponent(filename)}`
+        )
+        .then(r=>{
+            if(!r.ok) throw new Error("Not found");
+            return r.json();
+        })
+        .then(setData)
+        .catch(()=>setData({error:true}));
+
+    },[filename]);
+
+
+    if(!filename)return null;
+
+    if(!data)
+        return (
+            <div className="panel">
+                <div className="empty">
+                    Loading transcript...
+                </div>
+            </div>
+        );
+
+    if(data.error)
+        return (
+            <div className="panel">
+                <div className="empty">
+                    Could not load this transcript — it may have been saved under an
+                    invalid name (e.g. containing "/" or ":"). Delete it and record
+                    a fresh session.
+                </div>
+            </div>
+        );
+
+    const tabContent = {
+        brief: data.brief || "No brief available.",
+        summary: data.summary || "No summary available.",
+        mom: data.mom || "No minutes of meeting available."
+    };
+
+    const tabLabels = {
+        brief: "Brief",
+        summary: "General Summary",
+        mom: "Minutes of Meeting"
+    };
+
+    return (
+
+        <div className="panel">
+
+            <div className="panel-header">
+
+                <div>
+
+                    <div className="panel-title">
+                        {filename}
+                    </div>
+
+                    <div className="panel-subtitle">
+                        AI-generated meeting intelligence
+                    </div>
+
+                </div>
+
+                <button
+                    className="primary-btn"
+                    onClick={()=>window.open(`${API_BASE}/transcripts/${encodeURIComponent(filename)}/report-pdf`, "_blank")}
+                >
+                    ⬇ Download Report (PDF)
+                </button>
+
+            </div>
+
+            <div className="panel-body">
+
+                <div className="analytics-grid">
+
+                    <div className="analytics-card">
+
+                        <div className="analytics-number">
+                            {Math.round(data.duration || 0)}s
+                        </div>
+
+                        <div className="analytics-label">
+                            Duration
+                        </div>
+
+                    </div>
+
+                    <div className="analytics-card">
+
+                        <div className="analytics-number">
+                            {data.language || "EN"}
+                        </div>
+
+                        <div className="analytics-label">
+                            Language
+                        </div>
+
+                    </div>
+
+                    {data.sentiment && data.sentiment.overall &&
+                        <div className="analytics-card">
+
+                            <div className="analytics-number" style={{
+                                color: data.sentiment.overall === "Positive" ? "var(--green)"
+                                     : data.sentiment.overall === "Negative" ? "var(--red)"
+                                     : data.sentiment.overall === "Mixed" ? "var(--orange)"
+                                     : "var(--muted)"
+                            }}>
+                                {data.sentiment.overall}
+                            </div>
+
+                            <div className="analytics-label">
+                                Sentiment
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+                {data.sentiment && data.sentiment.explanation &&
+                    <div
+                        style={{
+                            fontSize:11,
+                            lineHeight:1.6,
+                            color:"var(--muted)",
+                            marginBottom:16,
+                            padding:"10px 13px",
+                            background:"#f8fafc",
+                            borderRadius:8,
+                            border:"1px solid var(--border)"
+                        }}
+                    >
+                        {data.sentiment.explanation}
+                    </div>
+                }
+
+
+                <div className="section-tabs" style={{marginBottom:14}}>
+                    {Object.keys(tabLabels).map(key=>
+                        <button
+                            key={key}
+                            className={"section-tab "+(activeTab===key?"active":"")}
+                            onClick={()=>setActiveTab(key)}
+                        >
+                            {tabLabels[key]}
+                        </button>
+                    )}
+                </div>
+
+                <div
+                    style={{
+                        background:"#f8fafc",
+                        border:"1px solid var(--border)",
+                        borderRadius:8,
+                        padding:15,
+                        fontSize:12,
+                        lineHeight:1.7,
+                        marginBottom:20,
+                        whiteSpace:"pre-wrap"
+                    }}
+                >
+                    {tabContent[activeTab]}
+                </div>
+
+
+                <div
+                    style={{
+                        fontSize:11,
+                        fontWeight:700,
+                        marginBottom:8
+                    }}
+                >
+                    Full transcript
+                </div>
+
+                <div
+                    style={{
+                        background:"#f8fafc",
+                        border:"1px solid var(--border)",
+                        borderRadius:8,
+                        padding:15,
+                        fontSize:11,
+                        lineHeight:1.7,
+                        maxHeight:280,
+                        overflow:"auto",
+                        color:"var(--muted)"
+                    }}
+                >
+                    {data.text}
+                </div>
+
+            </div>
+
+        </div>
+    )
+}
+
+
+function Camera() {
+    const videoRef=useRef(null);
+    const [cameraOn,setCameraOn]=useState(false);
+    const [stream,setStream]=useState(null);
+
+    useEffect(()=>{
+        return ()=>{
+            if(stream)
+                stream.getTracks().forEach(track=>track.stop());
+        };
+    },[stream]);
+
+    const startCamera=async()=>{
+        try {
+            const mediaStream=await navigator.mediaDevices.getUserMedia({
+                video:true,
+                audio:true
+            });
+
+            videoRef.current.srcObject=mediaStream;
+            setStream(mediaStream);
+            setCameraOn(true);
+        } catch(error) {
+            console.error("Camera error:",error);
+            alert("Please allow camera and microphone access.");
+        }
+    };
+
+    const stopCamera=()=>{
+        if(stream)
+            stream.getTracks().forEach(track=>track.stop());
+
+        if(videoRef.current)
+            videoRef.current.srcObject=null;
+
+        setStream(null);
+        setCameraOn(false);
+    };
+
+    return (
+        <div className="camera-preview">
+            {!cameraOn &&
+                <button
+                    className="primary-btn"
+                    onClick={startCamera}
+                >
+                    Camera
+                </button>
+            }
+
+            <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                style={{display:cameraOn?"block":"none"}}
+            />
+
+            {cameraOn &&
+                <div className="camera-controls">
+                    <button
+                        className="primary-btn"
+                        style={{background:"var(--red)"}}
+                        onClick={stopCamera}
+                    >
+                        Stop camera
+                    </button>
+                </div>
+            }
+        </div>
+    );
+}
+
+
+function Transcripts({
+    transcriptFiles,
+    selected,
+    setSelected,
+    uploadAudio,
+    deleteFile,
+    startRecording,
+    isRecording,
+    stopRecording,
+    liveText,
+    loading
+}) {
+
+    return (
+
+        <>
+
+            <div className="hero">
+
+                <div>
+
+                    <h1>
+                        Meeting intelligence
+                    </h1>
+
+                    <p>
+                        Turn recordings and conversations into searchable AI notes.
+                    </p>
+
+                </div>
+
+                <div style={{display:"flex",gap:8}}>
+
+                    <label className="primary-btn">
+
+                        + Upload recording
+
+                        <input
+                            type="file"
+                            onChange={uploadAudio}
+                            accept=".mp3,.wav,.m4a,.mp4,.mov,.webm,.ogg"
+                        />
+
+                    </label>
+
+                    {!isRecording ?
+
+                        <button
+                            className="primary-btn"
+                            style={{
+                                background:"var(--purple)"
+                            }}
+                            onClick={startRecording}
+                        >
+                            ● Record
+                        </button>
+
+                    :
+
+                        <button
+                            className="primary-btn"
+                            style={{
+                                background:"var(--red)"
+                            }}
+                            onClick={stopRecording}
+                        >
+                            ■ Stop
+                        </button>
+                    }
+
+                </div>
+
+            </div>
+
+
+            {isRecording &&
+
+                <div className="live">
+
+                    <div className="live-status">
+                        ● LIVE RECORDING
+                    </div>
+
+                    <div className="live-text">
+                        {liveText || "Listening..."}
+                    </div>
+
+                    <Camera />
+
+                </div>
+            }
+
+
+            <div className="panel" style={{marginTop:18}}>
+
+                <div className="panel-header">
+
+                    <div>
+
+                        <div className="panel-title">
+                            Recordings & transcripts
+                        </div>
+
+                        <div className="panel-subtitle">
+                            Processed meeting intelligence
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div className="file-list">
+
+                    {transcriptFiles.length===0 ?
+
+                        <div className="empty">
+                            No transcripts yet.
+                        </div>
+
+                    :
+
+                        transcriptFiles.map(file=>
+
+                            <div
+                                className="file-row"
+                                key={file}
+                                onClick={()=>setSelected(file)}
+                                style={{cursor:"pointer"}}
+                            >
+
+                                <FileIcon type="audio"/>
+
+                                <div className="file-info">
+
+                                    <div className="file-name">
+                                        {file}
+                                    </div>
+
+                                    <div className="file-meta">
+                                        AI transcription and summary available
+                                    </div>
+
+                                </div>
+
+                                <span className="file-status">
+                                    Processed
+                                </span>
+
+                                <button
+                                    className="delete"
+                                    onClick={(e)=>{
+                                        e.stopPropagation();
+                                        deleteFile(file);
+                                    }}
+                                >
+                                    ×
+                                </button>
+
+                            </div>
+
+                        )
+                    }
+
+                </div>
+
+            </div>
+
+
+            {selected &&
+                <div style={{marginTop:18}}>
+                    <TranscriptPanel filename={selected}/>
+                </div>
+            }
+
+        </>
+    )
+}
+
+/* ================= CHAT ================= */
+
+function Chat({
+    messages,
+    input,
+    setInput,
+    sendQuestion,
+    loading
+}) {
+
+    const downloadChatPdf = async (text, index) => {
+        try {
+            const res = await fetch(`${API_BASE}/export/text-pdf`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    title: `Scribe AI Answer ${index + 1}`,
+                    text: text
+                })
+            });
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `scribe-answer-${index + 1}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            alert("PDF export failed: " + err.message);
+        }
+    };
+
+    return (
+
+        <div className="panel chat">
+
+            <div className="panel-header">
+
+                <div>
+
+                    <div className="panel-title">
+                        Scribe AI
+                    </div>
+
+                    <div className="panel-subtitle">
+                        Ask questions across your entire workspace
+                    </div>
+
+                </div>
+
+                <div className="status">
+                    <span className="status-dot"></span>
+                    AI ready
+                </div>
+
+            </div>
+
+
+            <div className="chat-window">
+
+                {messages.length===0 ?
+
+                    <div className="chat-empty">
+
+                        <div className="chat-empty-icon">
+                            ✦
+                        </div>
+
+                        <div className="chat-empty-title">
+                            Ask your workspace
+                        </div>
+
+                        <div className="chat-empty-text">
+                            Scribe can answer questions using your documents,
+                            datasets and meeting transcripts.
+                        </div>
+
+                    </div>
+
+                :
+
+                    messages.map((m,i)=>
+
+                        <div
+                            className={"message "+m.role}
+                            key={i}
+                        >
+
+                            <div className="message-bubble">
+                                {m.text}
+                            </div>
+
+                            {m.citations &&
+                                m.citations.length>0 &&
+
+                                <div className="citations">
+                                    Sources:
+                                    {" "}
+                                    {m.citations
+                                        .map(
+                                            c=>
+                                            `${c.filename} · chunk ${c.chunk_index}`
+                                        )
+                                        .join(" · ")
+                                    }
+                                </div>
+                            }
+
+                            {m.role==="assistant" &&
+
+                                <button
+                                    onClick={()=>downloadChatPdf(m.text, i)}
+                                    style={{
+                                        marginTop:8,
+                                        border:"1px solid var(--border)",
+                                        background:"white",
+                                        color:"var(--primary)",
+                                        fontSize:10,
+                                        fontWeight:700,
+                                        padding:"5px 10px",
+                                        borderRadius:6
+                                    }}
+                                >
+                                    ⬇ Download as PDF
+                                </button>
+                            }
+
+                        </div>
+
+                    )
+
+                }
+
+            </div>
+
+
+            <div className="composer">
+
+                <input
+                    type="text"
+                    value={input}
+                    placeholder="Ask anything about your workspace..."
+                    onChange={e=>setInput(e.target.value)}
+                    onKeyDown={
+                        e=>{
+                            if(e.key==="Enter")
+                                sendQuestion();
+                        }
+                    }
+                />
+
+                <button
+                    className="send"
+                    onClick={sendQuestion}
+                    disabled={loading}
+                >
+                    {loading ? "..." : "Ask AI"}
+                </button>
+
+            </div>
+
+        </div>
+    )
+}
+
+/* ================= APP ================= */
+
+function App() {
+
+    // ---- Auth guard: redirect to login if no user is stored ----
+    const [currentUser] = useState(() => {
+        const stored = localStorage.getItem("scribeUser");
+        return stored ? JSON.parse(stored) : null;
+    });
+
+    useEffect(() => {
+        if (!currentUser) {
+            window.location.href = "auth.html";
+        }
+    }, [currentUser]);
+
+    const logout = () => {
+        localStorage.removeItem("scribeUser");
+        window.location.href = "auth.html";
+    };
+
+    const [section,setSection]=useState("documents");
+
+    const [documents,setDocuments]=useState([]);
+    const [dataFiles,setDataFiles]=useState([]);
+    const [transcriptFiles,setTranscriptFiles]=useState([]);
+
+    const [selectedData,setSelectedData]=useState(null);
+    const [selectedTranscript,setSelectedTranscript]=useState(null);
+
+    const [messages,setMessages]=useState([]);
+    const [input,setInput]=useState("");
+
+    const [loading,setLoading]=useState(false);
+
+    const [isRecording,setIsRecording]=useState(false);
+    const [liveText,setLiveText]=useState("");
+
+    const recognitionRef=useRef(null);
+
+    // While redirecting (or if somehow no user), render nothing to avoid a flash of the app
+    if (!currentUser) {
+        return null;
+    }
+
+
+    const refreshAll=async()=>{
+
+        try {
+
+            const [
+                docsRes,
+                dataRes,
+                transRes
+            ]=await Promise.all([
+
+                fetch(`${API_BASE}/documents`)
+                    .then(r=>r.json()),
+
+                fetch(`${API_BASE}/analytics`)
+                    .then(r=>r.json()),
+
+                fetch(`${API_BASE}/transcripts`)
+                    .then(r=>r.json())
+
+            ]);
+
+            setDocuments(docsRes.documents||[]);
+            setDataFiles(dataRes.files||[]);
+            setTranscriptFiles(transRes.files||[]);
+
+        } catch(err) {
+
+            console.error(err);
+
+        }
+
+    };
+
+
+    useEffect(()=>{
+        refreshAll();
+    },[]);
+
+
+    const upload=async(e)=>{
+
+        const file=e.target.files[0];
+
+        if(!file)return;
+
+        setLoading(true);
+
+        const form=new FormData();
+
+        form.append("file",file);
+
+        try {
+
+            const res=await fetch(
+                `${API_BASE}/upload`,
+                {
+                    method:"POST",
+                    body:form
+                }
+            );
+
+            const result=await res.json();
+
+            await refreshAll();
+
+            if(result.type==="data"){
+
+                setSection("datasets");
+                setSelectedData(result.filename);
+
+            }
+
+        } catch(err){
+
+            alert(
+                "Upload failed: "+err.message
+            );
+
+        }
+
+        setLoading(false);
+
+        e.target.value="";
+    };
+
+
+    const uploadAudio=async(e)=>{
+
+        const file=e.target.files[0];
+
+        if(!file)return;
+
+        setLoading(true);
+
+        const form=new FormData();
+
+        form.append("file",file);
+
+        try {
+
+            const res=await fetch(
+                `${API_BASE}/transcribe`,
+                {
+                    method:"POST",
+                    body:form
+                }
+            );
+
+            if(!res.ok)
+                throw new Error(
+                    "Transcription failed"
+                );
+
+            const result=await res.json();
+
+            await refreshAll();
+
+            setSection("transcripts");
+
+            setSelectedTranscript(
+                result.filename
+            );
+
+        } catch(err){
+
+            alert(
+                "Transcription failed: "+err.message
+            );
+
+        }
+
+        setLoading(false);
+
+        e.target.value="";
+    };
+
+
+    const deleteFile=async(filename)=>{
+
+        if(
+            !confirm(
+                `Remove "${filename}"?`
+            )
+        )return;
+
+        await fetch(
+            `${API_BASE}/documents/${encodeURIComponent(filename)}`,
+            {
+                method:"DELETE"
+            }
+        );
+
+        await refreshAll();
+
+        if(selectedData===filename)
+            setSelectedData(null);
+
+        if(selectedTranscript===filename)
+            setSelectedTranscript(null);
+    };
+
+
+    const startRecording=()=>{
+
+        const SpeechRecognition=
+            window.SpeechRecognition ||
+            window.webkitSpeechRecognition;
+
+        if(!SpeechRecognition){
+
+            alert(
+                "Live transcription requires Chrome or Edge."
+            );
+
+            return;
+        }
+
+        const recognition=
+            new SpeechRecognition();
+
+        recognition.continuous=true;
+        recognition.interimResults=true;
+        recognition.lang="en-US";
+
+        let finalText="";
+
+        recognition.onresult=(event)=>{
+
+            let interim="";
+
+            for(
+                let i=event.resultIndex;
+                i<event.results.length;
+                i++
+            ){
+
+                const text=
+                    event.results[i][0].transcript;
+
+                if(
+                    event.results[i].isFinal
+                )
+                    finalText+=text+" ";
+
+                else
+                    interim+=text;
+            }
+
+            setLiveText(
+                finalText+interim
+            );
+        };
+
+        recognition.start();
+
+        recognitionRef.current=
+            recognition;
+
+        setLiveText("");
+
+        setIsRecording(true);
+    };
+
+
+    const stopRecording=async()=>{
+
+        if(recognitionRef.current)
+            recognitionRef.current.stop();
+
+        setIsRecording(false);
+
+        if(!liveText.trim())
+            return;
+
+        setLoading(true);
+
+        // Build a URL-safe title — no slashes, colons, or commas,
+        // since those break FastAPI's path-parameter routing.
+        const now = new Date();
+        const pad = (n) => String(n).padStart(2, "0");
+        const safeTitle =
+            `Live Session ${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ` +
+            `${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+
+        try {
+
+            const res=await fetch(
+                `${API_BASE}/summarize-live`,
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                        "application/json"
+                    },
+
+                    body:JSON.stringify({
+                        text:liveText,
+                        title: safeTitle
+                    })
+                }
+            );
+
+            if(!res.ok)
+                throw new Error("Summarization request failed");
+
+            const result=await res.json();
+
+            await refreshAll();
+
+            setSelectedTranscript(
+                result.filename
+            );
+
+        } catch(err){
+
+            alert(
+                "Summarization failed: "+
+                err.message
+            );
+
+        }
+
+        setLoading(false);
+        setLiveText("");
+    };
+
+
+    const sendQuestion=async()=>{
+
+        if(!input.trim())
+            return;
+
+        const question=input;
+
+        setMessages(
+            prev=>[
+                ...prev,
+                {
+                    role:"user",
+                    text:question
+                }
+            ]
+        );
+
+        setInput("");
+        setLoading(true);
+
+        try {
+
+            const res=await fetch(
+                `${API_BASE}/query`,
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                        "application/json"
+                    },
+
+                    body:JSON.stringify({
+                        question
+                    })
+                }
+            );
+
+            const data=await res.json();
+
+            setMessages(
+                prev=>[
+                    ...prev,
+                    {
+                        role:"assistant",
+                        text:data.answer,
+                        citations:data.citations
+                    }
+                ]
+            );
+
+        } catch(err){
+
+            setMessages(
+                prev=>[
+                    ...prev,
+                    {
+                        role:"assistant",
+                        text:
+                        "Something went wrong: "+
+                        err.message
+                    }
+                ]
+            );
+
+        }
+
+        setLoading(false);
+    };
+
+
+    return (
+
+        <div className="app">
+
+            <Sidebar
+                section={section}
+                setSection={setSection}
+                documents={documents}
+                dataFiles={dataFiles}
+                transcriptFiles={transcriptFiles}
+                currentUser={currentUser}
+                logout={logout}
+            />
+
+            <main className="main">
+
+                <Topbar
+                    section={section}
+                />
+
+                <div className="content">
+
+                    <Stats
+                        documents={documents}
+                        dataFiles={dataFiles}
+                        transcriptFiles={transcriptFiles}
+                        messages={messages}
+                    />
+
+
+                    {section==="documents" &&
+
+                        <Documents
+                            documents={documents}
+                            dataFiles={dataFiles}
+                            transcriptFiles={transcriptFiles}
+                            upload={upload}
+                            deleteFile={deleteFile}
+                            loading={loading}
+                        />
+                    }
+
+
+                    {section==="datasets" &&
+
+                        <Datasets
+                            dataFiles={dataFiles}
+                            selected={selectedData}
+                            setSelected={setSelectedData}
+                            upload={upload}
+                            deleteFile={deleteFile}
+                        />
+                    }
+
+
+                    {section==="transcripts" &&
+
+                        <Transcripts
+                            transcriptFiles={transcriptFiles}
+                            selected={selectedTranscript}
+                            setSelected={setSelectedTranscript}
+                            uploadAudio={uploadAudio}
+                            deleteFile={deleteFile}
+                            startRecording={startRecording}
+                            isRecording={isRecording}
+                            stopRecording={stopRecording}
+                            liveText={liveText}
+                            loading={loading}
+                        />
+                    }
+
+
+                    <Chat
+                        messages={messages}
+                        input={input}
+                        setInput={setInput}
+                        sendQuestion={sendQuestion}
+                        loading={loading}
+                    />
+
+                </div>
+
+            </main>
+
+        </div>
+    )
+}
+
+
+
+ReactDOM
+    .createRoot(
+        document.getElementById("root")
+    )
+    .render(<App/>);
+
+</script>
+
+</body>
+</html>

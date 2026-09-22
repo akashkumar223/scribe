@@ -1,0 +1,19 @@
+{
+  "aka747945@gmail.com": {
+    "email": "aka747945@gmail.com",
+    "role": "user",
+    "salt": "44d0163c99f856b9c4635adb1896151f",
+    "password_hash": "7f3ba242dc9aba6c752bef3d7b9d4755ab2da1eba1b9b1b927ceac04016266af"
+  },
+  "aka74794589@gmail.com": {
+    "email": "aka74794589@gmail.com",
+    "role": "user",
+    "salt": "2f3da5b363cbe3a16d4049662aaa0a4d",
+    "password_hash": "3877cdfe70e271771578ee2cc5cd43cb23535f9cfa8089bdb77e0876bc896f09"
+  },
+  "aryansinghktr11@gmail.com": {
+    "email": "aryansinghktr11@gmail.com",
+    "password_hash": "262796670f4f9c400ced7ea0482dc7bb$367a143e0bf9300ef49461a2b853a421a7a6c7e2353e7162f948a10e1156c694",
+    "role": "user"
+  }
+}
