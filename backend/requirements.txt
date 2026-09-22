@@ -22,4 +22,3 @@ numpy==1.26.4
 sentence-transformers==3.0.1
 reportlab==4.2.5
 matplotlib==3.9.2
-
