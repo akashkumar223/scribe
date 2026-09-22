@@ -4,7 +4,7 @@ python-multipart==0.0.9
 faster-whisper==1.0.3
 
 torch==2.6.0
-torchaudio>=2.9.0
+torchaudio==2.9.0
 pydub==0.25.1
 requests==2.32.3
 python-dotenv==1.0.1
